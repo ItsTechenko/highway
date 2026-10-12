@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Highway Patrol — SASP</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#0d1b2e; --navy-2:#13263f; --navy-3:#1b3352;
+  --gold:#d4a72c; --gold-soft:rgba(212,167,44,.14);
+  --bg:#f4f5f7; --card:#ffffff; --text:#1a2230; --muted:#5d6b7e; --line:#dfe3ea;
+  --red:#c0392b; --green:#2e8b57;
+  --radius:10px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--text);line-height:1.6;font-size:15px}
+h1,h2,h3,.brand,.nav a{font-family:'Barlow Condensed',sans-serif;letter-spacing:.02em}
+a{color:inherit}
+
+/* ---------- Layout ---------- */
+.layout{display:flex;min-height:100vh}
+.sidebar{width:270px;flex-shrink:0;background:var(--navy);color:#e6ebf2;position:sticky;top:0;height:100vh;overflow-y:auto;display:flex;flex-direction:column}
+.brand{display:flex;align-items:center;gap:12px;padding:24px 20px;border-bottom:1px solid rgba(255,255,255,.08)}
+.badge{width:46px;height:46px;flex-shrink:0}
+.brand-text strong{display:block;font-size:22px;color:#fff;line-height:1}
+.brand-text span{font-size:13px;color:var(--gold);text-transform:uppercase;letter-spacing:.12em}
+.nav{padding:14px 10px;flex:1}
+.nav-label{font-size:11px;text-transform:uppercase;letter-spacing:.14em;color:#7d8ca3;padding:14px 12px 6px;font-family:'Inter',sans-serif}
+.nav a{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:8px;text-decoration:none;font-size:18px;font-weight:500;color:#c9d2df;transition:.15s}
+.nav a:hover{background:var(--navy-2);color:#fff}
+.nav a.active{background:var(--gold-soft);color:var(--gold);box-shadow:inset 3px 0 0 var(--gold)}
+.nav a .dot{width:6px;height:6px;border-radius:50%;background:currentColor;opacity:.5}
+.side-foot{padding:16px 20px;font-size:12px;color:#7d8ca3;border-top:1px solid rgba(255,255,255,.08)}
+
+main{flex:1;min-width:0}
+.topbar{display:none}
+.page{display:none;padding:40px 48px 64px;max-width:1000px}
+.page.active{display:block;animation:fade .25s ease}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+/* ---------- Typo / blocks ---------- */
+.eyebrow{font-size:12px;text-transform:uppercase;letter-spacing:.16em;color:var(--gold);font-weight:600;margin-bottom:6px}
+h1{font-size:40px;line-height:1.1;color:var(--navy);margin-bottom:10px}
+h2{font-size:26px;color:var(--navy);margin:30px 0 10px}
+h3{font-size:20px;color:var(--navy);margin:20px 0 8px}
+.lead{font-size:17px;color:var(--muted);max-width:720px;margin-bottom:24px}
+p{margin-bottom:10px}
+ul,ol{margin:6px 0 14px 22px}
+li{margin-bottom:5px}
+.radio{font-style:italic;background:var(--gold-soft);padding:1px 6px;border-radius:4px;color:#7a5c0e}
+.todo{border:1px dashed var(--gold);background:#fffaf0;border-radius:var(--radius);padding:14px 16px;color:#7a5c0e;font-size:14px;margin:14px 0}
+.todo strong{display:block;margin-bottom:2px}
+
+table{width:100%;border-collapse:collapse;margin:10px 0 18px;background:var(--card);border-radius:var(--radius);overflow:hidden;border:1px solid var(--line);font-size:14px}
+th{background:var(--navy);color:#fff;text-align:left;padding:10px 12px;font-weight:600;font-size:13px;text-transform:uppercase;letter-spacing:.05em}
+td{padding:10px 12px;border-top:1px solid var(--line);vertical-align:top}
+tr:nth-child(even) td{background:#fafbfc}
+.table-wrap{overflow-x:auto}
+
+/* ---------- Home ---------- */
+.hero{background:linear-gradient(135deg,var(--navy) 0%,var(--navy-3) 100%);color:#fff;border-radius:14px;padding:36px;position:relative;overflow:hidden;margin-bottom:28px}
+.hero::after{content:"";position:absolute;right:-60px;top:-60px;width:260px;height:260px;border-radius:50%;border:34px solid rgba(212,167,44,.12)}
+.hero h1{color:#fff}
+.hero .lead{color:#c9d2df;margin-bottom:0}
+.motto{margin-top:18px;font-family:'Barlow Condensed';font-size:20px;color:var(--gold);letter-spacing:.08em;text-transform:uppercase}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:14px}
+.tile{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:18px;text-decoration:none;transition:.15s;display:block}
+.tile:hover{border-color:var(--gold);transform:translateY(-2px);box-shadow:0 6px 18px rgba(13,27,46,.08)}
+.tile strong{font-family:'Barlow Condensed';font-size:21px;color:var(--navy);display:block}
+.tile span{font-size:13px;color:var(--muted)}
+
+/* ---------- SOP accordions ---------- */
+.sop{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);margin-bottom:12px;overflow:hidden}
+.sop summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:14px;padding:16px 18px}
+.sop summary::-webkit-details-marker{display:none}
+.sop .num{font-family:'Barlow Condensed';font-weight:700;font-size:15px;background:var(--navy);color:var(--gold);border-radius:6px;padding:4px 8px;flex-shrink:0}
+.sop .title{font-family:'Barlow Condensed';font-size:22px;font-weight:600;color:var(--navy);flex:1}
+.sop .chev{transition:.2s;color:var(--muted)}
+.sop[open] .chev{transform:rotate(180deg)}
+.sop[open] summary{border-bottom:1px solid var(--line)}
+.sop .body{padding:6px 22px 18px}
+.sop .body h3:first-child{margin-top:12px}
+.toolbar{display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap}
+.btn{border:1px solid var(--line);background:var(--card);padding:8px 14px;border-radius:8px;font:inherit;font-size:14px;cursor:pointer;color:var(--navy)}
+.btn:hover{border-color:var(--gold)}
+.search{flex:1;min-width:200px;border:1px solid var(--line);border-radius:8px;padding:9px 14px;font:inherit;font-size:14px}
+.search:focus,.btn:focus-visible{outline:2px solid var(--gold);outline-offset:1px}
+
+.code{font-family:'Barlow Condensed';font-weight:700;font-size:17px;color:var(--navy);white-space:nowrap}
+.tag{display:inline-block;font-size:11px;padding:2px 8px;border-radius:20px;font-weight:600;text-transform:uppercase;letter-spacing:.05em}
+.tag.red{background:#fdecea;color:var(--red)}
+.tag.green{background:#e8f5ee;color:var(--green)}
+
+/* ---------- Mobile ---------- */
+@media (max-width:860px){
+  .layout{display:block}
+  .sidebar{position:fixed;left:0;top:0;transform:translateX(-100%);transition:.25s;z-index:20;box-shadow:0 0 40px rgba(0,0,0,.3)}
+  .sidebar.open{transform:none}
+  .topbar{display:flex;align-items:center;justify-content:space-between;background:var(--navy);color:#fff;padding:12px 16px;position:sticky;top:0;z-index:10}
+  .topbar strong{font-family:'Barlow Condensed';font-size:20px}
+  .menu-btn{background:none;border:1px solid rgba(255,255,255,.25);color:#fff;border-radius:6px;padding:6px 10px;font-size:14px}
+  .page{padding:24px 16px 48px}
+  h1{font-size:32px}
+  .hero{padding:24px}
+}
+@media print{
+  .sidebar,.topbar,.toolbar{display:none!important}
+  .page{display:block!important;padding:0}
+  .sop{break-inside:avoid}
+}
+</style>
+</head>
+<body>
+<div class="layout">
+
+  <!-- ================= SIDEBAR ================= -->
+  <aside class="sidebar" id="sidebar">
+    <div class="brand">
+      <svg class="badge" viewBox="0 0 100 100" aria-hidden="true">
+        <polygon points="50,4 61,36 95,36 67,56 78,90 50,70 22,90 33,56 5,36 39,36" fill="#d4a72c"/>
+        <circle cx="50" cy="50" r="19" fill="#0d1b2e"/>
+        <text x="50" y="56" text-anchor="middle" font-family="Barlow Condensed" font-weight="700" font-size="17" fill="#d4a72c">HP</text>
+      </svg>
+      <div class="brand-text"><strong>Highway Patrol</strong><span>San Andreas State Police</span></div>
+    </div>
+    <nav class="nav" id="nav">
+      <div class="nav-label">Général</div>
+      <a href="#accueil"><span class="dot"></span>Accueil</a>
+      <a href="#reglement"><span class="dot"></span>Règlement intérieur</a>
+      <a href="#grades"><span class="dot"></span>Grades & hiérarchie</a>
+      <div class="nav-label">Opérationnel</div>
+      <a href="#sop"><span class="dot"></span>Procédures (SOP)</a>
+      <a href="#radio"><span class="dot"></span>Codes radio</a>
+      <a href="#infractions"><span class="dot"></span>Infractions & amendes</a>
+      <a href="#vehicules"><span class="dot"></span>Véhicules & équipement</a>
+      <div class="nav-label">Carrière</div>
+      <a href="#recrutement"><span class="dot"></span>Recrutement & formation</a>
+      <a href="#ressources"><span class="dot"></span>Ressources & liens</a>
+    </nav>
+    <div class="side-foot">Document interne — usage RP uniquement.<br>Dernière mise à jour : <span id="maj"></span></div>
+  </aside>
+
+  <main>
+    <div class="topbar">
+      <strong>Highway Patrol — SASP</strong>
+      <button class="menu-btn" id="menuBtn" aria-label="Ouvrir le menu">☰ Menu</button>
+    </div>
+
+    <!-- ================= ACCUEIL ================= -->
+    <section class="page" id="accueil">
+      <div class="hero">
+        <div class="eyebrow">Portail des agents</div>
+        <h1>Bienvenue à la Highway Patrol</h1>
+        <p class="lead">Tout ce dont un agent a besoin pour servir sur les routes de San Andreas : procédures, codes radio, règlement et parcours de formation.</p>
+        <div class="motto">Servir · Protéger · Sécuriser les routes</div>
+      </div>
+
+      <h2>Accès rapide</h2>
+      <div class="grid">
+        <a class="tile" href="#sop"><strong>Procédures (SOP)</strong><span>Contrôles, poursuites, accidents, barrages</span></a>
+        <a class="tile" href="#radio"><strong>Codes radio</strong><span>Liste des codes 10 et format d'appel</span></a>
+        <a class="tile" href="#reglement"><strong>Règlement intérieur</strong><span>Comportement, tenue, sanctions</span></a>
+        <a class="tile" href="#grades"><strong>Grades</strong><span>Hiérarchie et conditions de promotion</span></a>
+        <a class="tile" href="#infractions"><strong>Infractions</strong><span>Grille des amendes</span></a>
+        <a class="tile" href="#recrutement"><strong>Recrutement</strong><span>Rejoindre l'unité et se former</span></a>
+      </div>
+
+      <h2>Notre mission</h2>
+      <p>La Highway Patrol assure la sécurité des autoroutes, des routes nationales et des axes ruraux de San Andreas. En ville, l'unité intervient en appui des autres services ou lors de poursuites engagées hors agglomération.</p>
+    </section>
+
+    <!-- ================= REGLEMENT ================= -->
+    <section class="page" id="reglement">
+      <div class="eyebrow">Général</div>
+      <h1>Règlement intérieur</h1>
+      <p class="lead">Les règles de conduite applicables à tout agent de la Highway Patrol, en service comme hors service.</p>
+
+      <h2>Principes généraux</h2>
+      <ul>
+        <li><strong>Sécurité d'abord</strong> : celle des civils, puis des agents, puis du suspect.</li>
+        <li><strong>Professionnalisme</strong> : vouvoiement, calme et respect en toutes circonstances.</li>
+        <li><strong>Communication</strong> : chaque action importante est annoncée à la radio.</li>
+        <li><strong>Traçabilité</strong> : toute amende, saisie, arrestation ou usage de la force fait l'objet d'un rapport.</li>
+        <li><strong>Hiérarchie</strong> : sur une scène, le plus gradé dirige ; à grade égal, le premier arrivé.</li>
+      </ul>
+
+      <h2>Tenue et présentation</h2>
+      <div class="todo"><strong>À compléter</strong>Tenues autorisées par grade, tenue de cérémonie, accessoires interdits.</div>
+
+      <h2>Sanctions internes</h2>
+      <div class="table-wrap"><table>
+        <tr><th>Niveau</th><th>Exemple de faute</th><th>Sanction</th></tr>
+        <tr><td>Avertissement</td><td>Oubli de rapport, retard de communication radio</td><td>Avertissement écrit</td></tr>
+        <tr><td>Blâme</td><td>Non-respect répété d'une SOP</td><td>Blâme + reformation</td></tr>
+        <tr><td>Mise à pied</td><td>Usage de la force disproportionné</td><td>Suspension temporaire</td></tr>
+        <tr><td>Renvoi</td><td>Corruption, faute grave</td><td>Exclusion de l'unité</td></tr>
+      </table></div>
+      <div class="todo"><strong>À adapter</strong>Ces niveaux sont un exemple : aligne-les sur la politique du SASP et du staff.</div>
+    </section>
+
+    <!-- ================= GRADES ================= -->
+    <section class="page" id="grades">
+      <div class="eyebrow">Général</div>
+      <h1>Grades & hiérarchie</h1>
+      <p class="lead">Du Cadet au Captain, chaque grade ouvre de nouvelles responsabilités.</p>
+      <div class="table-wrap"><table>
+        <tr><th>Grade</th><th>Rôle</th><th>Accès à la promotion</th></tr>
+        <tr><td><strong>Captain</strong></td><td>Commandement de l'unité</td><td>Nomination</td></tr>
+        <tr><td><strong>Lieutenant</strong></td><td>Adjoint au commandement, gestion des effectifs</td><td>Nomination</td></tr>
+        <tr><td><strong>Sergeant</strong></td><td>Superviseur de terrain, autorise PIT et barrages</td><td>À définir</td></tr>
+        <tr><td><strong>Corporal</strong></td><td>Chef de patrouille, FTO</td><td>À définir</td></tr>
+        <tr><td><strong>Senior Trooper</strong></td><td>Agent confirmé, habilité PIT</td><td>À définir</td></tr>
+        <tr><td><strong>Trooper</strong></td><td>Agent de patrouille</td><td>Validation de la formation</td></tr>
+        <tr><td><strong>Cadet</strong></td><td>En formation, jamais seul en patrouille</td><td>Recrutement</td></tr>
+      </table></div>
+      <div class="todo"><strong>À compléter</strong>Ancienneté minimale, formations requises et nombre de places par grade.</div>
+    </section>
+
+    <!-- ================= SOP ================= -->
+    <section class="page" id="sop">
+      <div class="eyebrow">Opérationnel</div>
+      <h1>Procédures opérationnelles (SOP)</h1>
+      <p class="lead">Ces procédures priment sur les habitudes personnelles. Un agent qui s'en écarte doit pouvoir le justifier dans son rapport.</p>
+      <div class="toolbar">
+        <button class="btn" id="openAll">Tout déplier</button>
+        <button class="btn" id="closeAll">Tout replier</button>
+        <button class="btn" onclick="window.print()">Imprimer</button>
+      </div>
+
+      <details class="sop">
+        <summary><span class="num">SOP 01</span><span class="title">Prise et fin de service</span><span class="chev">▼</span></summary>
+        <div class="body">
+          <p>Un agent n'est en service qu'après s'être annoncé à la radio, et il n'en sort qu'après l'avoir signalé.</p>
+          <h3>Prise de service</h3>
+          <ol>
+            <li>Se rendre au poste de la Highway Patrol en tenue réglementaire.</li>
+            <li>Récupérer l'équipement de dotation à l'armurerie (voir SOP 08).</li>
+            <li>Sortir un véhicule autorisé pour son grade et vérifier son état.</li>
+            <li>S'annoncer : <span class="radio">« Central, [matricule] en service, secteur [zone], 10-8. »</span></li>
+            <li>Rejoindre son secteur de patrouille ou le binôme assigné.</li>
+          </ol>
+          <h3>Pendant le service</h3>
+          <ul>
+            <li>Signaler tout changement de statut (10-6 occupé, 10-7 pause, 10-8 disponible).</li>
+            <li>Ne jamais quitter son secteur sans en informer le central ou le superviseur.</li>
+            <li>Un Cadet ne patrouille jamais seul : il est toujours accompagné d'un agent confirmé ou d'un FTO.</li>
+          </ul>
+          <h3>Fin de service</h3>
+          <ol>
+            <li>Terminer ou transmettre toute intervention en cours.</li>
+            <li>Rédiger les rapports en attente avant de quitter le service.</li>
+            <li>Ranger le véhicule au garage et rendre l'équipement de dotation.</li>
+            <li>S'annoncer : <span class="radio">« Central, [matricule] fin de service, 10-10. »</span></li>
+          </ol>
+        </div>
+      </details>
+
+      <details class="sop">
+        <summary><span class="num">SOP 02</span><span class="title">Contrôle routier standard</span><span class="chev">▼</span></summary>
+        <div class="body">
+          <p>Vise une infraction simple (vitesse, feu, équipement) sur un conducteur qui n'est pas connu comme dangereux.</p>
+          <h3>Avant l'arrêt</h3>
+          <ol>
+            <li>Identifier l'infraction et noter la plaque, le modèle et la couleur du véhicule.</li>
+            <li>Annoncer : <span class="radio">« Central, [matricule], 10-38 sur [plaque], [modèle], [position]. »</span></li>
+            <li>Choisir un emplacement sûr : bande d'arrêt d'urgence, parking, accotement large. Éviter virages, ponts et tunnels.</li>
+            <li>Activer gyrophares puis sirène si nécessaire pour faire arrêter le véhicule.</li>
+          </ol>
+          <h3>Positionnement</h3>
+          <ul>
+            <li>S'arrêter 1 à 2 longueurs derrière le suspect, décalé d'un demi-véhicule vers la voie de circulation.</li>
+            <li>Laisser les gyrophares allumés pendant tout le contrôle.</li>
+          </ul>
+          <h3>Approche et contact</h3>
+          <ol>
+            <li>Approcher en restant derrière le montant central (pilier B).</li>
+            <li>Observer l'intérieur : mains, passagers, objets visibles.</li>
+            <li>Se présenter : <span class="radio">« Bonjour, Trooper [nom], Highway Patrol du SASP. Je vous ai arrêté pour [motif]. Permis, carte grise et assurance, s'il vous plaît. »</span></li>
+            <li>Retourner au véhicule de patrouille pour vérifier documents et plaque au MDT (10-28 / 10-29).</li>
+          </ol>
+          <h3>Conclusion</h3>
+          <ul>
+            <li>Infraction mineure : avertissement oral ou amende selon la grille des infractions.</li>
+            <li>Permis suspendu, véhicule volé ou mandat actif : renfort (10-78), puis SOP 03 si la situation se tend.</li>
+            <li>Clôturer : <span class="radio">« Central, [matricule], 10-38 terminé, amende / avertissement, 10-8. »</span></li>
+          </ul>
+          <p>Un conducteur qui refuse d'obtempérer ou prend la fuite déclenche la <strong>SOP 04</strong>.</p>
+        </div>
+      </details>
+
+      <details class="sop">
+        <summary><span class="num">SOP 03</span><span class="title">Contrôle à risque (Felony Stop)</span><span class="chev">▼</span></summary>
+        <div class="body">
+          <p>S'applique à un véhicule volé, un suspect armé ou recherché, ou la fin d'une poursuite. Deux unités minimum ; personne ne s'approche du véhicule avant que tous les occupants en soient sortis.</p>
+          <h3>Déclenchement</h3>
+          <ol>
+            <li>Annoncer : <span class="radio">« Central, [matricule], Felony Stop sur [plaque], [motif], demande 10-78. »</span></li>
+            <li>Attendre le renfort avant de faire arrêter le véhicule, sauf danger immédiat.</li>
+          </ol>
+          <h3>Positionnement</h3>
+          <ul>
+            <li>Véhicules à 2 ou 3 longueurs derrière le suspect, côte à côte et en V, pour servir de couverture.</li>
+            <li>Agents derrière leur portière ouverte, arme dégainée et pointée vers le véhicule.</li>
+            <li>Un seul agent donne les ordres : le premier arrivé ou le plus gradé.</li>
+          </ul>
+          <h3>Extraction, un occupant à la fois</h3>
+          <ol>
+            <li><span class="radio">« Conducteur, coupez le moteur et jetez les clés par la fenêtre. »</span></li>
+            <li><span class="radio">« Mains à l'extérieur de la fenêtre. Ouvrez la porte par l'extérieur. »</span></li>
+            <li><span class="radio">« Sortez, mains en l'air, et tournez-vous lentement. »</span></li>
+            <li><span class="radio">« Reculez vers ma voix. Stop. À genoux. Croisez les chevilles. »</span></li>
+            <li>Un second agent menotte et fouille le suspect, puis le place dans un véhicule de patrouille.</li>
+            <li>Répéter pour chaque occupant, du conducteur vers l'arrière.</li>
+          </ol>
+          <h3>Sécurisation</h3>
+          <ul>
+            <li>Deux agents approchent pour vérifier que le véhicule est vide.</li>
+            <li>Annoncer : <span class="radio">« Central, véhicule sécurisé, [nombre] suspect(s) en détention, code 4. »</span></li>
+          </ul>
+        </div>
+      </details>
+
+      <details class="sop">
+        <summary><span class="num">SOP 04</span><span class="title">Poursuite et règles d'engagement</span><span class="chev">▼</span></summary>
+        <div class="body">
+          <p>Une poursuite n'est maintenue que tant que le danger qu'elle crée reste inférieur à celui de laisser fuir le suspect. Le superviseur peut y mettre fin à tout moment.</p>
+          <h3>Déclenchement</h3>
+          <ul>
+            <li>Annoncer : <span class="radio">« Central, [matricule], 10-80 sur [plaque], [modèle], direction [axe], vitesse [km/h]. »</span></li>
+            <li>Donner la position et la direction à chaque changement d'axe.</li>
+          </ul>
+          <h3>Organisation des unités</h3>
+          <div class="table-wrap"><table>
+            <tr><th>Rôle</th><th>Mission</th></tr>
+            <tr><td>Unité 1 (lead)</td><td>Reste au contact du suspect, ne lâche jamais le visuel</td></tr>
+            <tr><td>Unité 2 (radio)</td><td>Annonce la position, la direction et le comportement du suspect</td></tr>
+            <tr><td>Unités 3 et plus</td><td>Se positionnent en avant pour un barrage ou une herse (SOP 06)</td></tr>
+            <tr><td>Air-1 (si disponible)</td><td>Prend le relais de la radio, les unités au sol reculent</td></tr>
+          </table></div>
+          <p>Maximum <strong>3 véhicules</strong> directement derrière le suspect.</p>
+          <h3>Techniques d'arrêt</h3>
+          <div class="table-wrap"><table>
+            <tr><th>Technique</th><th>Conditions</th><th>Grade minimum</th></tr>
+            <tr><td>Herse</td><td>Route droite, sans civil à proximité, annoncée à la radio</td><td>Trooper</td></tr>
+            <tr><td>PIT</td><td>Moins de 100 km/h, hors pont, tunnel et foule, autorisé par le superviseur</td><td>Senior Trooper</td></tr>
+            <tr><td>Box-in</td><td>Véhicule suspect lent ou à l'arrêt, 3 unités minimum</td><td>Trooper</td></tr>
+          </table></div>
+          <h3>Abandon de la poursuite</h3>
+          <ul>
+            <li>Le suspect roule à contresens ou traverse une zone très fréquentée (centre-ville, école).</li>
+            <li>Le visuel est perdu depuis plus de 1 minute.</li>
+            <li>Un civil ou un agent est gravement blessé à cause de la poursuite.</li>
+            <li>Le superviseur ordonne l'arrêt.</li>
+          </ul>
+          <p>En cas d'abandon, transmettre description et plaque au central pour un avis de recherche. Toute poursuite fait l'objet d'un rapport.</p>
+        </div>
+      </details>
+
+      <details class="sop">
+        <summary><span class="num">SOP 05</span><span class="title">Accident de la route</span><span class="chev">▼</span></summary>
+        <div class="body">
+          <p>L'ordre est toujours le même : <strong>protéger, alerter, secourir, puis constater</strong>.</p>
+          <ol>
+            <li><strong>Protéger</strong> : garer le véhicule en amont, en biais, gyrophares allumés. Baliser avec des cônes si disponibles.</li>
+            <li><strong>Alerter</strong> : <span class="radio">« Central, [matricule], 10-50 sur [axe], [nombre] véhicule(s), [nombre] blessé(s), demande EMS / dépanneuse. »</span></li>
+            <li><strong>Secourir</strong> : vérifier l'état des victimes sans les déplacer, sauf danger immédiat. Laisser la prise en charge aux EMS dès leur arrivée.</li>
+            <li><strong>Sécuriser</strong> : dévier ou bloquer la circulation si nécessaire, éloigner les curieux.</li>
+            <li><strong>Constater</strong> : relever identités, plaques et témoignages. Vérifier les conducteurs (alcool, stupéfiants, permis).</li>
+            <li><strong>Clôturer</strong> : évacuation par la dépanneuse, réouverture de la voie, rapport d'accident.</li>
+          </ol>
+          <p>Si l'accident fait suite à un délit (délit de fuite, conduite sous influence, poursuite), le conducteur responsable est placé en détention.</p>
+        </div>
+      </details>
+
+      <details class="sop">
+        <summary><span class="num">SOP 06</span><span class="title">Barrage routier</span><span class="chev">▼</span></summary>
+        <div class="body">
+          <p>Mis en place sur ordre d'un superviseur, pour intercepter un suspect en fuite ou pour un contrôle préventif.</p>
+          <h3>Barrage d'interception</h3>
+          <ol>
+            <li>Choisir un point avec bonne visibilité, au moins 300 m en amont, sans échappatoire facile.</li>
+            <li>Placer 2 véhicules en travers, en laissant un passage contrôlé si la route reste ouverte.</li>
+            <li>Déployer la herse 50 à 100 m avant le barrage, opérée par un agent à couvert.</li>
+            <li>Les agents se positionnent derrière les véhicules, jamais devant.</li>
+            <li>Annoncer : <span class="radio">« Central, barrage en place sur [axe], herse prête. »</span></li>
+          </ol>
+          <h3>Barrage de contrôle préventif</h3>
+          <ul>
+            <li>Signaler le barrage avec gyrophares et cônes, assez loin pour que les conducteurs ralentissent.</li>
+            <li>Un agent oriente, un second contrôle, un troisième surveille et reste prêt à poursuivre.</li>
+            <li>Un véhicule qui force le barrage déclenche la SOP 04.</li>
+          </ul>
+        </div>
+      </details>
+
+      <details class="sop">
+        <summary><span class="num">SOP 07</span><span class="title">Escorte et convoi</span><span class="chev">▼</span></summary>
+        <div class="body">
+          <p>Protéger un véhicule sensible (transfert de détenu, convoi de fonds, personnalité) d'un point A à un point B, sans arrêt non prévu.</p>
+          <h3>Préparation</h3>
+          <ul>
+            <li>Itinéraire principal et itinéraire de repli fixés avant le départ, communiqués aux seules unités engagées.</li>
+            <li>Fréquence radio dédiée si possible.</li>
+          </ul>
+          <h3>Formation type</h3>
+          <div class="table-wrap"><table>
+            <tr><th>Position</th><th>Rôle</th></tr>
+            <tr><td>Ouvreur</td><td>300 m devant : repère les dangers, bloque les carrefours</td></tr>
+            <tr><td>Tête</td><td>Juste devant le véhicule escorté, fixe l'allure</td></tr>
+            <tr><td>Véhicule escorté</td><td>Ne s'arrête jamais sans ordre du chef d'escorte</td></tr>
+            <tr><td>Serre-file</td><td>Derrière, empêche toute insertion et surveille l'arrière</td></tr>
+          </table></div>
+          <h3>En route</h3>
+          <ul>
+            <li>Allure constante, gyrophares allumés, sirène aux carrefours uniquement.</li>
+            <li>En cas d'attaque : le véhicule escorté ne s'arrête pas, la tête l'extrait par l'itinéraire de repli, le serre-file couvre et appelle les renforts (10-99).</li>
+            <li>Annoncer l'arrivée : <span class="radio">« Central, escorte arrivée à destination, code 4. »</span></li>
+          </ul>
+        </div>
+      </details>
+
+      <details class="sop">
+        <summary><span class="num">SOP 08</span><span class="title">Usage de la force et armement</span><span class="chev">▼</span></summary>
+        <div class="body">
+          <p>La force employée est toujours proportionnelle à la menace, et redescend dès que la menace baisse.</p>
+          <h3>Échelle de la force</h3>
+          <div class="table-wrap"><table>
+            <tr><th>Niveau</th><th>Comportement du suspect</th><th>Réponse autorisée</th></tr>
+            <tr><td>1</td><td>Coopératif</td><td>Présence et ordres verbaux</td></tr>
+            <tr><td>2</td><td>Résistance passive (refus, inertie)</td><td>Contrôle à mains nues, menottage</td></tr>
+            <tr><td>3</td><td>Résistance active (se débat, fuit à pied)</td><td>Taser, matraque</td></tr>
+            <tr><td>4</td><td>Agression physique sans arme à feu</td><td>Taser, matraque, force physique renforcée</td></tr>
+            <tr><td>5</td><td>Menace mortelle (arme, tir, véhicule utilisé comme arme)</td><td>Arme de service</td></tr>
+          </table></div>
+          <h3>Règles sur l'arme de service</h3>
+          <ul>
+            <li>Dégainée uniquement en Felony Stop ou face à une menace de niveau 4 ou 5.</li>
+            <li>Tir autorisé uniquement pour protéger une vie, après sommation quand c'est possible : <span class="radio">« Police, lâchez votre arme ! »</span></li>
+            <li>Aucun tir sur un véhicule en fuite qui ne représente pas une menace mortelle directe.</li>
+            <li>Tout tir est annoncé (10-71) et fait l'objet d'un rapport immédiat au superviseur.</li>
+          </ul>
+        </div>
+      </details>
+    </section>
+
+    <!-- ================= RADIO ================= -->
+    <section class="page" id="radio">
+      <div class="eyebrow">Opérationnel</div>
+      <h1>Codes radio</h1>
+      <p class="lead">Format d'un appel : <span class="radio">« Central, [matricule], [code], [lieu], [précisions]. »</span> Parler court, attendre le 10-4 avant de continuer.</p>
+      <div class="toolbar"><input class="search" id="radioSearch" type="search" placeholder="Rechercher un code ou un mot (ex : poursuite, 10-80)…"></div>
+      <div class="table-wrap"><table id="radioTable">
+        <thead><tr><th style="width:110px">Code</th><th>Signification</th></tr></thead>
+        <tbody></tbody>
+      </table></div>
+    </section>
+
+    <!-- ================= INFRACTIONS ================= -->
+    <section class="page" id="infractions">
+      <div class="eyebrow">Opérationnel</div>
+      <h1>Infractions & amendes</h1>
+      <p class="lead">Grille de référence pour les infractions routières. Elle doit rester alignée sur le code pénal du serveur.</p>
+      <div class="toolbar"><input class="search" id="finesSearch" type="search" placeholder="Rechercher une infraction…"></div>
+      <div class="table-wrap"><table id="finesTable">
+        <thead><tr><th>Infraction</th><th>Amende</th><th>Mesure complémentaire</th></tr></thead>
+        <tbody></tbody>
+      </table></div>
+      <div class="todo"><strong>À compléter</strong>Les montants sont laissés vides : renseigne-les dans le tableau <code>AMENDES</code> en bas du fichier index.html.</div>
+    </section>
+
+    <!-- ================= VEHICULES ================= -->
+    <section class="page" id="vehicules">
+      <div class="eyebrow">Opérationnel</div>
+      <h1>Véhicules & équipement</h1>
+      <p class="lead">Le parc et l'équipement autorisés dépendent du grade.</p>
+      <div class="table-wrap"><table>
+        <tr><th>Catégorie</th><th>Véhicule</th><th>Grade minimum</th></tr>
+        <tr><td>Patrouille</td><td>À définir</td><td>Cadet (accompagné)</td></tr>
+        <tr><td>Interceptor</td><td>À définir</td><td>Trooper</td></tr>
+        <tr><td>Moto</td><td>À définir</td><td>Senior Trooper</td></tr>
+        <tr><td>Banalisé</td><td>À définir</td><td>Sergeant</td></tr>
+      </table></div>
+      <h2>Dotation</h2>
+      <ul>
+        <li>Arme de service, taser, matraque, menottes, radio : tous grades.</li>
+        <li>Armes longues : agents habilités, sur autorisation d'un superviseur.</li>
+        <li>Herse, cônes : disponibles dans les véhicules de patrouille.</li>
+      </ul>
+      <div class="todo"><strong>À compléter</strong>Noms exacts des véhicules et des armes sur ton serveur.</div>
+    </section>
+
+    <!-- ================= RECRUTEMENT ================= -->
+    <section class="page" id="recrutement">
+      <div class="eyebrow">Carrière</div>
+      <h1>Recrutement & formation</h1>
+      <p class="lead">Le parcours d'un nouvel agent, de la candidature à la validation du grade de Trooper.</p>
+      <h2>Parcours</h2>
+      <ol>
+        <li><strong>Candidature</strong> : formulaire envoyé au commandement.</li>
+        <li><strong>Entretien</strong> : questions de mise en situation avec un gradé.</li>
+        <li><strong>Période Cadet</strong> : patrouilles accompagnées d'un FTO.</li>
+        <li><strong>Modules de formation</strong> : chaque module est validé par un FTO.</li>
+        <li><strong>Évaluation finale</strong> : passage au grade de Trooper.</li>
+      </ol>
+      <h2>Modules de formation</h2>
+      <div class="table-wrap"><table>
+        <tr><th>Module</th><th>Contenu</th><th>Validation</th></tr>
+        <tr><td>Radio & procédures</td><td>Codes radio, SOP 01</td><td><span class="tag red">FTO</span></td></tr>
+        <tr><td>Contrôle routier</td><td>SOP 02 et SOP 03</td><td><span class="tag red">FTO</span></td></tr>
+        <tr><td>Conduite & poursuite</td><td>SOP 04 et SOP 06</td><td><span class="tag red">FTO</span></td></tr>
+        <tr><td>Accident & escorte</td><td>SOP 05 et SOP 07</td><td><span class="tag red">FTO</span></td></tr>
+        <tr><td>Usage de la force</td><td>SOP 08</td><td><span class="tag red">FTO</span></td></tr>
+        <tr><td>Rapports</td><td>Rédaction des rapports types</td><td><span class="tag green">Sergeant</span></td></tr>
+      </table></div>
+    </section>
+
+    <!-- ================= RESSOURCES ================= -->
+    <section class="page" id="ressources">
+      <div class="eyebrow">Carrière</div>
+      <h1>Ressources & liens</h1>
+      <p class="lead">Les liens utiles de l'unité.</p>
+      <div class="grid" id="linksGrid"></div>
+    </section>
+  </main>
+</div>
+
+<script>
+/* =====================================================
+   ZONE À MODIFIER FACILEMENT
+   ===================================================== */
+const DERNIERE_MAJ = "12/10/2026";
+
+const CODES_RADIO = [
+  ["10-4","Reçu, compris"],
+  ["10-6","Occupé"],
+  ["10-7","En pause / indisponible"],
+  ["10-8","Disponible, en service"],
+  ["10-10","Fin de service"],
+  ["10-20","Position"],
+  ["10-28","Vérification de plaque"],
+  ["10-29","Vérification d'identité / avis de recherche"],
+  ["10-38","Contrôle routier"],
+  ["10-50","Accident de la route"],
+  ["10-71","Coups de feu"],
+  ["10-78","Demande de renfort"],
+  ["10-80","Poursuite en cours"],
+  ["10-99","Agent en danger, toutes unités"],
+  ["Code 4","Situation sous contrôle, plus besoin de renfort"]
+];
+
+// [infraction, amende, mesure complémentaire]
+const AMENDES = [
+  ["Excès de vitesse (moins de 30 km/h)","—","—"],
+  ["Excès de vitesse (plus de 30 km/h)","—","Retrait de points"],
+  ["Grand excès de vitesse (plus de 50 km/h)","—","Suspension du permis"],
+  ["Feu rouge ou stop grillé","—","—"],
+  ["Conduite sans permis","—","Fourrière"],
+  ["Conduite sous influence","—","Arrestation"],
+  ["Délit de fuite / refus d'obtempérer","—","Arrestation"],
+  ["Conduite dangereuse","—","—"],
+  ["Véhicule non assuré","—","Fourrière"]
+];
+
+// [titre, description, lien]
+const LIENS = [
+  ["Discord de l'unité","Annonces, planning et rapports","#"],
+  ["MDT","Vérification des plaques et identités","#"],
+  ["Formulaire de candidature","Postuler à la Highway Patrol","#"],
+  ["Modèles de rapports","Incident, accident, poursuite","#"]
+];
+/* ===================================================== */
+
+const $ = s => document.querySelector(s);
+$("#maj").textContent = DERNIERE_MAJ;
+
+const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+function fillTable(tbody, rows, render){ tbody.innerHTML = rows.map(render).join(""); }
+fillTable($("#radioTable tbody"), CODES_RADIO, r => `<tr><td class="code">${esc(r[0])}</td><td>${esc(r[1])}</td></tr>`);
+fillTable($("#finesTable tbody"), AMENDES, r => `<tr><td>${esc(r[0])}</td><td>${esc(r[1])}</td><td>${esc(r[2])}</td></tr>`);
+$("#linksGrid").innerHTML = LIENS.map(l => `<a class="tile" href="${esc(l[2])}" target="_blank" rel="noopener"><strong>${esc(l[0])}</strong><span>${esc(l[1])}</span></a>`).join("");
+
+function bindSearch(input, table){
+  input.addEventListener("input", () => {
+    const q = input.value.toLowerCase().trim();
+    table.querySelectorAll("tbody tr").forEach(tr => {
+      tr.style.display = tr.textContent.toLowerCase().includes(q) ? "" : "none";
+    });
+  });
+}
+bindSearch($("#radioSearch"), $("#radioTable"));
+bindSearch($("#finesSearch"), $("#finesTable"));
+
+/* Navigation par onglets (#hash) */
+const pages = [...document.querySelectorAll(".page")];
+const links = [...document.querySelectorAll(".nav a")];
+function show(){
+  const id = (location.hash || "#accueil").slice(1);
+  const target = pages.some(p => p.id === id) ? id : "accueil";
+  pages.forEach(p => p.classList.toggle("active", p.id === target));
+  links.forEach(a => a.classList.toggle("active", a.getAttribute("href") === "#" + target));
+  $("#sidebar").classList.remove("open");
+  window.scrollTo(0, 0);
+}
+window.addEventListener("hashchange", show);
+show();
+
+$("#menuBtn").addEventListener("click", () => $("#sidebar").classList.toggle("open"));
+$("#openAll").addEventListener("click", () => document.querySelectorAll(".sop").forEach(d => d.open = true));
+$("#closeAll").addEventListener("click", () => document.querySelectorAll(".sop").forEach(d => d.open = false));
+</script>
+</body>
+</html>
